@@ -1,0 +1,587 @@
+LegendOfValor/
+├── main.py            # Game entry point
+├── accounts.py        # Admin & player account logic
+├── items.py           # Full item list (all tiers)
+├── inventory.py       # Inventory management
+├── utils.py           # Helper functions (like buying/selling)
+└── README.md          # Game instructions
+from accounts import Account, AdminAccount, PlayerAccount
+from items import ITEMS
+from inventory import Inventory
+
+def main():
+    print("Welcome to Legend of Valor!\n")
+    choice = input("Are you Admin or Player? (admin/player): ").lower()
+    
+    if choice == "admin":
+        username = input("Enter admin username: ")
+        admin = AdminAccount(username)
+        print(f"Welcome Admin {admin.username}!")
+        admin_menu(admin)
+    else:
+        username = input("Enter player username: ")
+        player = PlayerAccount(username)
+        print(f"Welcome Player {player.username}!")
+        player_menu(player)
+
+def admin_menu(admin):
+    while True:
+        print("\nAdmin Menu:")
+        print("1. View all items")
+        print("2. Give item to player")
+        print("3. Exit")
+        choice = input("Choice: ")
+        
+        if choice == "1":
+            for item in ITEMS:
+                print(f"{item['name']} -> {item['stats']} (${item['price']})")
+        elif choice == "2":
+            player_name = input("Enter player username: ")
+            item_name = input("Enter item name: ")
+            print(f"{admin.username} gave {item_name} to {player_name}.")
+        elif choice == "3":
+            break
+        else:
+            print("Invalid choice.")
+
+def player_menu(player):
+    inventory = Inventory()
+    while True:
+        print("\nPlayer Menu:")
+        print("1. View items")
+        print("2. Buy item")
+        print("3. View inventory")
+        print("4. Exit")
+        choice = input("Choice: ")
+        
+        if choice == "1":
+            for item in ITEMS:
+                print(f"{item['name']} -> {item['stats']} (${item['price']})")
+        elif choice == "2":
+            item_name = input("Enter item name to buy: ")
+            found = next((i for i in ITEMS if i['name'].lower() == item_name.lower()), None)
+            if found:
+                inventory.add_item(found)
+                print(f"You bought {found['name']}!")
+            else:
+                print("Item not found.")
+        elif choice == "3":
+            inventory.show()
+        elif choice == "4":
+            break
+        else:
+            print("Invalid choice.")
+
+if __name__ == "__main__":
+    main()
+
+class Account:
+    def __init__(self, username):
+        self.username = username
+
+class AdminAccount(Account):
+    def __init__(self, username):
+        super().__init__(username)
+        self.role = "admin"
+
+class PlayerAccount(Account):
+    def __init__(self, username):
+        super().__init__(username)
+        self.role = "player"
+        self.gold = 10000
+
+class Inventory:
+    def __init__(self):
+        self.items = []
+
+    def add_item(self, item):
+        self.items.append(item)
+
+    def show(self):
+        if not self.items:
+            print("Inventory is empty.")
+            return
+        print("Your Inventory:")
+        for item in self.items:
+            print(f"{item['name']} -> {item['stats']} (${item['price']})")
+
+def find_item(name, item_list):
+    return next((i for i in item_list if i['name'].lower() == name.lower()), None)
+
+# items_tier1.py
+# Tier 1: Normal / Rare Items
+
+items = [
+    {"name": "Arcane Staff", "type": "weapon", "stats": {"Int": 20}, "price": 300},
+    {"name": "Thunder Hammer", "type": "weapon", "stats": {"Str": 12, "Luck": 5}, "price": 280},
+    {"name": "Shadow Cloak", "type": "armor", "stats": {"Spd": 10, "Luck": 5}, "price": 300},
+    {"name": "Mystic Robes", "type": "armor", "stats": {"Int": 20}, "price": 300},
+    {"name": "Guardian Plate", "type": "armor", "stats": {"Str": 15}, "price": 320},
+    {"name": "Frost Dagger", "type": "weapon", "stats": {"Spd": 15}, "special": "Slow", "price": 330},
+    {"name": "Ember Wand", "type": "weapon", "stats": {"Int": 18}, "special": "Fire Damage", "price": 340},
+    {"name": "Lucky Ring", "type": "accessory", "stats": {"Luck": 20}, "price": 345},
+    {"name": "Flame Cloak", "type": "armor", "stats": {"Str": 15}, "special": "Fire Resist", "price": 350},
+    {"name": "Swift Helm", "type": "armor", "stats": {"Spd": 12, "Int": 5}, "price": 355},
+    {"name": "Thunder Bow", "type": "weapon", "stats": {"Spd": 18}, "special": "Lightning Damage", "price": 360},
+    {"name": "Arcane Amulet", "type": "accessory", "stats": {"Int": 20}, "special": "Mana Regen", "price": 365},
+    {"name": "Shadow Saber", "type": "weapon", "stats": {"Str": 20}, "special": "Stealth", "price": 370},
+    {"name": "Frost Robes", "type": "armor", "stats": {"Int": 18}, "special": "Freeze", "price": 365},
+    {"name": "Lucky Pendant", "type": "accessory", "stats": {"Luck": 22, "Str": 6}, "price": 370},
+    {"name": "Ember Blade", "type": "weapon", "stats": {"Str": 22}, "special": "Burn", "price": 375},
+    {"name": "Arcane Hood", "type": "armor", "stats": {"Int": 22}, "special": "Mana Boost", "price": 375},
+    {"name": "Swift Sword", "type": "weapon", "stats": {"Str": 20, "Spd": 12}, "price": 370},
+    {"name": "Ring of Fortune", "type": "accessory", "stats": {"Luck": 22, "Int": 10}, "price": 375},
+    {"name": "Firebrand Staff", "type": "weapon", "stats": {"Int": 24}, "special": "Fire AoE", "price": 380},
+    {"name": "Frost Fang", "type": "weapon", "stats": {"Str": 24}, "special": "Ice AoE", "price": 380},
+    {"name": "Lucky Charm", "type": "accessory", "stats": {"Luck": 24, "Str": 10}, "price": 380},
+    {"name": "Shadow Staff", "type": "weapon", "stats": {"Str": 25}, "special": "Stealth", "price": 385},
+    {"name": "Arcane Mantle", "type": "armor", "stats": {"Int": 25}, "special": "Mana Regen", "price": 385},
+    {"name": "Swift Boots", "type": "armor", "stats": {"Spd": 23, "Str": 15}, "price": 380},
+    {"name": "Ring of Insight", "type": "accessory", "stats": {"Luck": 25, "Int": 12}, "price": 385},
+    {"name": "Ember Dagger", "type": "weapon", "stats": {"Str": 26}, "special": "Fire Damage", "price": 390},
+    {"name": "Frost Helm", "type": "armor", "stats": {"Int": 26}, "special": "Freeze", "price": 390},
+    # … add remaining Normal/Rare items here, following same structure
+]
+
+# items_tier2.py
+# Tier 2: Super Rare (SR) Items
+
+items = [
+    {"name": "Elemental Vest", "type": "armor", "stats": {"Str": 10, "Spd": 10, "Int": 10, "Luck": 10}, "price": 400},
+    {"name": "Ring of Fortune", "type": "accessory", "stats": {"Luck": 20}, "price": 420},
+    {"name": "Frost Bow", "type": "weapon", "stats": {"Spd": 10, "Luck": 10}, "price": 430},
+    {"name": "Ember Robes", "type": "armor", "stats": {"Int": 18}, "special": "Fire Damage", "price": 440},
+    {"name": "Shadow Fang", "type": "weapon", "stats": {"Str": 20}, "special": "Stealth", "price": 445},
+    {"name": "Arcane Sabre", "type": "weapon", "stats": {"Str": 22}, "special": "Mana Regen", "price": 450},
+    {"name": "Lightning Dagger", "type": "weapon", "stats": {"Spd": 18}, "special": "Lightning Damage", "price": 455},
+    {"name": "Ring of Insight", "type": "accessory", "stats": {"Int": 22, "Luck": 0}, "price": 460},
+    {"name": "Swift Boots", "type": "armor", "stats": {"Spd": 20, "Str": 12}, "price": 465},
+    {"name": "Ember Staff", "type": "weapon", "stats": {"Int": 25}, "special": "Fire AoE", "price": 470},
+    {"name": "Frost Fang", "type": "weapon", "stats": {"Str": 25}, "special": "Ice AoE", "price": 470},
+    {"name": "Lucky Pendant", "type": "accessory", "stats": {"Luck": 25, "Str": 15}, "price": 475},
+    {"name": "Shadow Blade", "type": "weapon", "stats": {"Str": 27}, "special": "Stealth", "price": 480},
+    {"name": "Arcane Mantle", "type": "armor", "stats": {"Int": 27}, "special": "Mana Regen", "price": 480},
+    {"name": "Swift Sword", "type": "weapon", "stats": {"Str": 25, "Spd": 18}, "price": 485},
+    {"name": "Ring of Valor", "type": "accessory", "stats": {"Luck": 28, "Int": 18}, "price": 490},
+    {"name": "Ember Dagger", "type": "weapon", "stats": {"Str": 28}, "special": "Burn", "price": 495},
+    {"name": "Frost Staff", "type": "weapon", "stats": {"Int": 28}, "special": "Freeze", "price": 495},
+    {"name": "Lucky Ring", "type": "accessory", "stats": {"Luck": 28, "Str": 18}, "price": 500},
+    {"name": "Shadow Staff", "type": "weapon", "stats": {"Str": 30}, "special": "Stealth", "price": 505},
+    {"name": "Arcane Robes", "type": "armor", "stats": {"Int": 30}, "special": "Mana Regen", "price": 505},
+    {"name": "Swift Helm", "type": "armor", "stats": {"Spd": 28, "Str": 20}, "price": 510},
+    {"name": "Ring of Fortune", "type": "accessory", "stats": {"Luck": 30, "Int": 20}, "price": 510},
+    {"name": "Ember Blade", "type": "weapon", "stats": {"Str": 32}, "special": "Fire AoE", "price": 515},
+    {"name": "Frost Robes", "type": "armor", "stats": {"Int": 32}, "special": "Freeze", "price": 515},
+    {"name": "Lucky Pendant", "type": "accessory", "stats": {"Luck": 32, "Str": 22}, "price": 520},
+    {"name": "Shadow Dagger", "type": "weapon", "stats": {"Str": 34}, "special": "Stealth", "price": 525},
+    {"name": "Arcane Hood", "type": "armor", "stats": {"Int": 34}, "special": "Mana Boost", "price": 525},
+    {"name": "Swift Sword", "type": "weapon", "stats": {"Str": 33, "Spd": 24}, "price": 530},
+    {"name": "Ring of Insight", "type": "accessory", "stats": {"Luck": 34, "Int": 24}, "price": 530},
+    {"name": "Ember Staff", "type": "weapon", "stats": {"Int": 36}, "special": "Fire AoE", "price": 535},
+    {"name": "Frost Fang", "type": "weapon", "stats": {"Str": 36}, "special": "Ice AoE", "price": 535},
+    {"name": "Lucky Amulet", "type": "accessory", "stats": {"Luck": 36, "Str": 26}, "price": 540},
+    {"name": "Shadow Blade", "type": "weapon", "stats": {"Str": 38}, "special": "Stealth", "price": 545},
+    {"name": "Arcane Robes", "type": "armor", "stats": {"Int": 38}, "special": "Mana Regen", "price": 545},
+    {"name": "Swift Boots", "type": "armor", "stats": {"Spd": 36, "Str": 26}, "price": 540},
+    {"name": "Ring of Valor", "type": "accessory", "stats": {"Luck": 38, "Int": 26}, "price": 545},
+    {"name": "Ember Wand", "type": "weapon", "stats": {"Int": 40}, "special": "Fire AoE", "price": 550},
+    {"name": "Frost Saber", "type": "weapon", "stats": {"Str": 40}, "special": "Freeze", "price": 550},
+    {"name": "Lucky Ring", "type": "accessory", "stats": {"Luck": 40, "Str": 28}, "price": 555},
+    {"name": "Shadow Staff", "type": "weapon", "stats": {"Str": 41}, "special": "Stealth", "price": 555},
+    {"name": "Arcane Mantle", "type": "armor", "stats": {"Int": 41}, "special": "Mana Regen", "price": 555},
+    {"name": "Swift Helm", "type": "armor", "stats": {"Spd": 40, "Str": 28}, "price": 560},
+    {"name": "Ring of Fortune", "type": "accessory", "stats": {"Luck": 42, "Int": 28}, "price": 560},
+    {"name": "Ember Blade", "type": "weapon", "stats": {"Str": 42}, "special": "Burn", "price": 565},
+    {"name": "Frost Robes", "type": "armor", "stats": {"Int": 42}, "special": "Freeze", "price": 565},
+    {"name": "Lucky Pendant", "type": "accessory", "stats": {"Luck": 42, "Str": 30}, "price": 570},
+    {"name": "Shadow Dagger", "type": "weapon", "stats": {"Str": 44}, "special": "Stealth", "price": 575},
+    {"name": "Arcane Hood", "type": "armor", "stats": {"Int": 44}, "special": "Mana Boost", "price": 575},
+    {"name": "Swift Sword", "type": "weapon", "stats": {"Str": 45, "Spd": 30}, "price": 580},
+    {"name": "Ring of Insight", "type": "accessory", "stats": {"Luck": 44, "Int": 30}, "price": 575},
+    {"name": "Ember Staff", "type": "weapon", "stats": {"Int": 46}, "special": "Fire AoE", "price": 585},
+    {"name": "Frost Fang", "type": "weapon", "stats": {"Str": 46}, "special": "Ice AoE", "price": 585},
+    {"name": "Lucky Amulet", "type": "accessory", "stats": {"Luck": 46, "Str": 32}, "price": 590},
+    {"name": "Shadow Blade", "type": "weapon", "stats": {"Str": 48}, "special": "Stealth", "price": 595},
+    {"name": "Arcane Robes", "type": "armor", "stats": {"Int": 48}, "special": "Mana Regen", "price": 595},
+    {"name": "Swift Boots", "type": "armor", "stats": {"Spd": 46, "Str": 32}, "price": 590},
+    {"name": "Ring of Valor", "type": "accessory", "stats": {"Luck": 48, "Int": 32}, "price": 595},
+    {"name": "Ember Wand", "type": "weapon", "stats": {"Int": 50}, "special": "Fire AoE", "price": 600}
+    # … continue all remaining Super Rare items if needed
+]
+
+# items_tier3.py
+# Tier 3: X (Super Super Rare) Items
+
+items = [
+    {"name": "Titan’s Hammer", "type": "weapon", "stats": {"Str": 40, "Luck": 20}, "price": 1000},
+    {"name": "Infinity Bow", "type": "weapon", "stats": {"Spd": 40, "Luck": 20}, "price": 1000},
+    {"name": "Sage’s Staff", "type": "weapon", "stats": {"Int": 40, "Pot": 20}, "price": 1000},
+    {"name": "Omniguard Armor", "type": "armor", "stats": {"Str": 35, "Spd": 35, "Int": 35, "Luck": 35}, "price": 1050},
+    {"name": "Dragonfang Blade", "type": "weapon", "stats": {"Str": 45, "Spd": 25}, "price": 1100},
+    {"name": "Archmage Robes", "type": "armor", "stats": {"Int": 45, "Luck": 25}, "price": 1100},
+    {"name": "Shadow Eclipse Cloak", "type": "armor", "stats": {"Spd": 42, "Luck": 30}, "price": 1120},
+    {"name": "Phoenix Saber", "type": "weapon", "stats": {"Str": 50}, "special": "Fire Damage", "price": 1150},
+    {"name": "Frostbite Bow", "type": "weapon", "stats": {"Spd": 48}, "special": "Ice Damage", "price": 1150},
+    {"name": "Orb of Wisdom", "type": "accessory", "stats": {"Int": 45, "Luck": 20}, "price": 1130},
+    {"name": "Titan Gauntlets", "type": "armor", "stats": {"Str": 40, "Spd": 20}, "price": 1050},
+    {"name": "Lightning Hammer", "type": "weapon", "stats": {"Str": 48}, "special": "Lightning AoE", "price": 1150},
+    {"name": "Mystic Staff", "type": "weapon", "stats": {"Int": 50}, "special": "Mana Regen", "price": 1150},
+    {"name": "Shadow Fang", "type": "weapon", "stats": {"Str": 45}, "special": "Stealth", "price": 1130},
+    {"name": "Swift Boots", "type": "armor", "stats": {"Spd": 42, "Str": 28}, "price": 1120},
+    {"name": "Ring of Omniscience", "type": "accessory", "stats": {"Luck": 45, "Str": 0, "Int": 0, "Spd": 0}, "price": 1150},
+    {"name": "Ember Blade", "type": "weapon", "stats": {"Str": 48}, "special": "Burn", "price": 1150},
+    {"name": "Frost Saber", "type": "weapon", "stats": {"Str": 48}, "special": "Freeze", "price": 1150},
+    {"name": "Lucky Pendant", "type": "accessory", "stats": {"Luck": 50, "Str": 25}, "price": 1160},
+    {"name": "Shadow Staff", "type": "weapon", "stats": {"Str": 50}, "special": "Stealth", "price": 1160},
+    {"name": "Arcane Mantle", "type": "armor", "stats": {"Int": 50}, "special": "Mana Regen", "price": 1160},
+    {"name": "Swift Sword", "type": "weapon", "stats": {"Str": 48, "Spd": 38}, "price": 1150},
+    {"name": "Ring of Valor", "type": "accessory", "stats": {"Luck": 50, "Int": 38}, "price": 1160},
+    {"name": "Ember Wand", "type": "weapon", "stats": {"Int": 52}, "special": "Fire AoE", "price": 1170},
+    {"name": "Frost Fang", "type": "weapon", "stats": {"Str": 52}, "special": "Ice AoE", "price": 1170},
+    {"name": "Lucky Ring", "type": "accessory", "stats": {"Luck": 52, "Str": 40}, "price": 1175},
+    {"name": "Shadow Blade", "type": "weapon", "stats": {"Str": 54}, "special": "Stealth", "price": 1180},
+    {"name": "Arcane Robes", "type": "armor", "stats": {"Int": 54}, "special": "Mana Regen", "price": 1180},
+    {"name": "Swift Helm", "type": "armor", "stats": {"Spd": 52, "Str": 40}, "price": 1175},
+    {"name": "Ring of Fortune", "type": "accessory", "stats": {"Luck": 54, "Int": 40}, "price": 1180},
+    {"name": "Ember Staff", "type": "weapon", "stats": {"Int": 56}, "special": "Fire AoE", "price": 1190},
+    {"name": "Frost Saber", "type": "weapon", "stats": {"Str": 56}, "special": "Freeze", "price": 1190},
+    {"name": "Lucky Pendant", "type": "accessory", "stats": {"Luck": 56, "Str": 42}, "price": 1195},
+    {"name": "Shadow Dagger", "type": "weapon", "stats": {"Str": 58}, "special": "Stealth", "price": 1200},
+    {"name": "Arcane Hood", "type": "armor", "stats": {"Int": 58}, "special": "Mana Boost", "price": 1200},
+    {"name": "Swift Sword", "type": "weapon", "stats": {"Str": 56, "Spd": 42}, "price": 1195},
+    {"name": "Ring of Insight", "type": "accessory", "stats": {"Luck": 58, "Int": 42}, "price": 1200},
+    {"name": "Ember Blade", "type": "weapon", "stats": {"Str": 60}, "special": "Burn", "price": 1210},
+    {"name": "Frost Robes", "type": "armor", "stats": {"Int": 60}, "special": "Freeze", "price": 1210},
+    {"name": "Lucky Amulet", "type": "accessory", "stats": {"Luck": 60, "Str": 44}, "price": 1215},
+    {"name": "Shadow Saber", "type": "weapon", "stats": {"Str": 62}, "special": "Stealth", "price": 1220},
+    {"name": "Arcane Robes", "type": "armor", "stats": {"Int": 62}, "special": "Mana Regen", "price": 1220},
+    {"name": "Swift Boots", "type": "armor", "stats": {"Spd": 60, "Str": 44}, "price": 1215},
+    {"name": "Ring of Valor", "type": "accessory", "stats": {"Luck": 62, "Int": 44}, "price": 1220}
+    # Continue the list if necessary for all X tier items
+]
+
+# items_tier4_umr.py
+# Tier 4: UMR (Ultra Mythic Rare) Items
+
+items = [
+    {"name": "Oblivion Fang", "type": "weapon", "stats": {"Str": 80, "Luck": 50}, "price": 10000},
+    {"name": "Eternal Eclipse Blade", "type": "weapon", "stats": {"Str": 85, "Spd": 45}, "price": 10500},
+    {"name": "Archmage’s Eternal Robe", "type": "armor", "stats": {"Int": 85, "Luck": 50}, "price": 10500},
+    {"name": "Shadow Eclipse Mantle", "type": "armor", "stats": {"Spd": 80, "Luck": 50}, "price": 10200},
+    {"name": "Phoenix Soul Saber", "type": "weapon", "stats": {"Str": 90}, "special": "Fire AoE 40", "price": 11000},
+    {"name": "Frost Reaper Bow", "type": "weapon", "stats": {"Spd": 88}, "special": "Ice Damage 45", "price": 11000},
+    {"name": "Orb of Divine Insight", "type": "accessory", "stats": {"Int": 85, "Luck": 45}, "price": 10700},
+    {"name": "Titan’s Gauntlets", "type": "armor", "stats": {"Str": 80, "Spd": 50}, "price": 10200},
+    {"name": "Lightning Devastator", "type": "weapon", "stats": {"Str": 90}, "special": "Lightning AoE", "price": 11000},
+    {"name": "Mystic Grand Staff", "type": "weapon", "stats": {"Int": 90}, "special": "Mana Regen", "price": 11000},
+    {"name": "Shadow Fang Prime", "type": "weapon", "stats": {"Str": 85}, "special": "Stealth", "price": 10700},
+    {"name": "Swift Ascendant Boots", "type": "armor", "stats": {"Spd": 85, "Str": 50}, "price": 10500},
+    {"name": "Ring of Eternal Omniscience", "type": "accessory", "stats": {"Luck": 90, "Str": 0, "Int": 0, "Spd": 0}, "price": 11000},
+    {"name": "Inferno Edge", "type": "weapon", "stats": {"Str": 88}, "special": "Burn", "price": 11000},
+    {"name": "Glacial Saber", "type": "weapon", "stats": {"Str": 88}, "special": "Freeze", "price": 11000},
+    {"name": "Pendant of Absolute Luck", "type": "accessory", "stats": {"Luck": 90, "Str": 45}, "price": 11200},
+    {"name": "Eclipse Staff", "type": "weapon", "stats": {"Str": 90}, "special": "Stealth", "price": 11200},
+    {"name": "Arcane Mantle Prime", "type": "armor", "stats": {"Int": 90}, "special": "Mana Regen", "price": 11200},
+    {"name": "Swift Blade", "type": "weapon", "stats": {"Str": 88, "Spd": 55}, "price": 11100},
+    {"name": "Ring of Supreme Valor", "type": "accessory", "stats": {"Luck": 90, "Int": 55}, "price": 11200},
+    {"name": "Infernal Wand", "type": "weapon", "stats": {"Int": 92}, "special": "Fire AoE", "price": 11300},
+    {"name": "Frostfang Prime", "type": "weapon", "stats": {"Str": 92}, "special": "Ice AoE", "price": 11300},
+    {"name": "Lucky Talisman", "type": "accessory", "stats": {"Luck": 92, "Str": 50}, "price": 11350},
+    {"name": "Shadow Sabre", "type": "weapon", "stats": {"Str": 95}, "special": "Stealth", "price": 11400},
+    {"name": "Arcane Robes Prime", "type": "armor", "stats": {"Int": 95}, "special": "Mana Regen", "price": 11400},
+    {"name": "Ascendant Helm", "type": "armor", "stats": {"Spd": 92, "Str": 50}, "price": 11350},
+    {"name": "Ring of Supreme Fortune", "type": "accessory", "stats": {"Luck": 95, "Int": 50}, "price": 11400},
+    {"name": "Inferno Grand Staff", "type": "weapon", "stats": {"Int": 96}, "special": "Fire AoE", "price": 11500},
+    {"name": "Glacial Fang", "type": "weapon", "stats": {"Str": 96}, "special": "Ice AoE", "price": 11500},
+    {"name": "Lucky Amulet Prime", "type": "accessory", "stats": {"Luck": 96, "Str": 52}, "price": 11550},
+    {"name": "Shadow Blade Prime", "type": "weapon", "stats": {"Str": 98}, "special": "Stealth", "price": 11600},
+    {"name": "Arcane Mantle Eternal", "type": "armor", "stats": {"Int": 98}, "special": "Mana Regen", "price": 11600},
+    {"name": "Swift Ascendant Sword", "type": "weapon", "stats": {"Str": 96, "Spd": 52}, "price": 11550},
+    {"name": "Ring of Ultimate Valor", "type": "accessory", "stats": {"Luck": 98, "Int": 52}, "price": 11600},
+    {"name": "Ember Grand Blade", "type": "weapon", "stats": {"Str": 100}, "special": "Burn", "price": 11700},
+    {"name": "Frost Robes Eternal", "type": "armor", "stats": {"Int": 100}, "special": "Freeze", "price": 11700},
+    {"name": "Lucky Pendant Eternal", "type": "accessory", "stats": {"Luck": 100, "Str": 54}, "price": 11750},
+    {"name": "Shadow Saber Eternal", "type": "weapon", "stats": {"Str": 102}, "special": "Stealth", "price": 11800},
+    {"name": "Arcane Robes Eternal", "type": "armor", "stats": {"Int": 102}, "special": "Mana Regen", "price": 11800},
+    {"name": "Swift Helm Eternal", "type": "armor", "stats": {"Spd": 100, "Str": 54}, "price": 11750},
+    {"name": "Ring of Infinite Fortune", "type": "accessory", "stats": {"Luck": 102, "Int": 54}, "price": 11800},
+    {"name": "Inferno Wand Eternal", "type": "weapon", "stats": {"Int": 104}, "special": "Fire AoE", "price": 11900},
+    {"name": "Frostfang Eternal", "type": "weapon", "stats": {"Str": 104}, "special": "Ice AoE", "price": 11900},
+    {"name": "Lucky Amulet Supreme", "type": "accessory", "stats": {"Luck": 104, "Str": 56}, "price": 11950},
+    {"name": "Shadow Blade Supreme", "type": "weapon", "stats": {"Str": 106}, "special": "Stealth", "price": 12000},
+    {"name": "Arcane Mantle Supreme", "type": "armor", "stats": {"Int": 106}, "special": "Mana Regen", "price": 12000},
+    {"name": "Swift Sword Supreme", "type": "weapon", "stats": {"Str": 104, "Spd": 56}, "price": 11950},
+    {"name": "Ring of Supreme Omniscience", "type": "accessory", "stats": {"Luck": 106, "Int": 56}, "price": 12000},
+    {"name": "Ember Staff Supreme", "type": "weapon", "stats": {"Int": 108}, "special": "Fire AoE", "price": 12100},
+    {"name": "Frost Saber Supreme", "type": "weapon", "stats": {"Str": 108}, "special": "Freeze", "price": 12100},
+    {"name": "Lucky Ring Supreme", "type": "accessory", "stats": {"Luck": 108, "Str": 58}, "price": 12150},
+    {"name": "Shadow Staff Supreme", "type": "weapon", "stats": {"Str": 110}, "special": "Stealth", "price": 12200},
+    {"name": "Arcane Robes Supreme", "type": "armor", "stats": {"Int": 110}, "special": "Mana Regen", "price": 12200},
+    {"name": "Swift Helm Supreme", "type": "armor", "stats": {"Spd": 108, "Str": 58}, "price": 12150},
+    {"name": "Ring of Ultimate Insight", "type": "accessory", "stats": {"Luck": 110, "Int": 58}, "price": 12200},
+    {"name": "Ember Blade Supreme", "type": "weapon", "stats": {"Str": 112}, "special": "Burn", "price": 12300},
+    {"name": "Frost Robes Supreme", "type": "armor", "stats": {"Int": 112}, "special": "Freeze", "price": 12300},
+    {"name": "Lucky Pendant Supreme", "type": "accessory", "stats": {"Luck": 112, "Str": 60}, "price": 12350},
+    {"name": "Shadow Dagger Supreme", "type": "weapon", "stats": {"Str": 114}, "special": "Stealth", "price": 12400},
+    {"name": "Arcane Hood Supreme", "type": "armor", "stats": {"Int": 114}, "special": "Mana Boost", "price": 12400},
+    {"name": "Swift Sword Eternal", "type": "weapon", "stats": {"Str": 112, "Spd": 60}, "price": 12350},
+    {"name": "Ring of Infinite Valor", "type": "accessory", "stats": {"Luck": 114, "Int": 60}, "price": 12400},
+    {"name": "Ember Staff Eternal", "type": "weapon", "stats": {"Int": 116}, "special": "Fire AoE", "price": 12500},
+    {"name": "Frost Fang Supreme", "type": "weapon", "stats": {"Str": 116}, "special": "Ice AoE", "price": 12500},
+    {"name": "Lucky Amulet Eternal", "type": "accessory", "stats": {"Luck": 116, "Str": 62}, "price": 12550},
+    {"name": "Shadow Blade Eternal", "type": "weapon", "stats": {"Str": 118}, "special": "Stealth", "price": 12600},
+    {"name": "Arcane Robes Eternal", "type": "armor", "stats": {"Int": 118}, "special": "Mana Regen", "price": 12600},
+    {"name": "Swift Helm Eternal", "type": "armor", "stats": {"Spd": 116, "Str": 62}, "price": 12550},
+    {"name": "Ring of Infinite Fortune", "type": "accessory", "stats": {"Luck": 118, "Int": 62}, "price": 12600},
+    {"name": "Ember Blade Eternal", "type": "weapon", "stats": {"Str": 120}, "special": "Fire AoE", "price": 12700}
+]
+
+# items_tier5_ssumr.py
+# Tier 5: SSUMR (Super Super Ultra Mythic Rare) Items
+
+items = [
+    {"name": "Oblivion Reaper Supreme", "type": "weapon", "stats": {"Str": 250, "Luck": 200}, "price": 10000000},
+    {"name": "Eternal Eclipse Greatblade Eternal", "type": "weapon", "stats": {"Str": 255, "Spd": 195}, "price": 10500000},
+    {"name": "Archmage Supreme Robe Eternal", "type": "armor", "stats": {"Int": 255, "Luck": 200}, "price": 10500000},
+    {"name": "Shadow Eclipse Eternal Mantle Supreme", "type": "armor", "stats": {"Spd": 250, "Luck": 200}, "price": 10200000},
+    {"name": "Phoenix Soul Grand Saber Eternal", "type": "weapon", "stats": {"Str": 260}, "special": "Fire AoE 190", "price": 11000000},
+    {"name": "Frost Reaper Eternal Bow Supreme", "type": "weapon", "stats": {"Spd": 258}, "special": "Ice Damage 195", "price": 11000000},
+    {"name": "Orb of Infinite Omniscience Eternal", "type": "accessory", "stats": {"Int": 255, "Luck": 195}, "price": 10700000},
+    {"name": "Titan’s Eternal Gauntlets Supreme", "type": "armor", "stats": {"Str": 250, "Spd": 200}, "price": 10200000},
+    {"name": "Lightning Devastator Supreme Eternal", "type": "weapon", "stats": {"Str": 260}, "special": "Lightning AoE", "price": 11000000},
+    {"name": "Mystic Grand Supreme Staff Eternal", "type": "weapon", "stats": {"Int": 260}, "special": "Mana Regen", "price": 11000000},
+    {"name": "Shadow Fang Eternal Supreme", "type": "weapon", "stats": {"Str": 255}, "special": "Stealth", "price": 10700000},
+    {"name": "Swift Ascendant Prime Boots Eternal", "type": "armor", "stats": {"Spd": 255, "Str": 200}, "price": 10500000},
+    {"name": "Ring of Infinite Omniscience Supreme Eternal", "type": "accessory", "stats": {"Luck": 260, "Str": 0, "Int": 0, "Spd": 0}, "price": 11000000},
+    {"name": "Inferno Edge Eternal Supreme", "type": "weapon", "stats": {"Str": 258}, "special": "Burn", "price": 11000000},
+    {"name": "Glacial Saber Supreme Eternal", "type": "weapon", "stats": {"Str": 258}, "special": "Freeze", "price": 11000000},
+    {"name": "Pendant of Absolute Infinity", "type": "accessory", "stats": {"Luck": 260, "Str": 190}, "price": 11200000},
+    {"name": "Eclipse Staff Eternal Supreme", "type": "weapon", "stats": {"Str": 260}, "special": "Stealth", "price": 11200000},
+    {"name": "Arcane Mantle Supreme Eternal", "type": "armor", "stats": {"Int": 260}, "special": "Mana Regen", "price": 11200000},
+    {"name": "Swift Grand Blade Eternal", "type": "weapon", "stats": {"Str": 258, "Spd": 205}, "price": 11100000},
+    {"name": "Ring of Infinite Valor Supreme Eternal", "type": "accessory", "stats": {"Luck": 260, "Int": 205}, "price": 11200000},
+    {"name": "Infernal Wand Eternal Supreme", "type": "weapon", "stats": {"Int": 262}, "special": "Fire AoE", "price": 11300000},
+    {"name": "Frostfang Eternal Supreme", "type": "weapon", "stats": {"Str": 262}, "special": "Ice AoE", "price": 11300000},
+    {"name": "Lucky Talisman Eternal Supreme", "type": "accessory", "stats": {"Luck": 262, "Str": 192}, "price": 11350000},
+    {"name": "Shadow Blade Eternal Supreme", "type": "weapon", "stats": {"Str": 265}, "special": "Stealth", "price": 11400000},
+    {"name": "Arcane Mantle Eternal Supreme", "type": "armor", "stats": {"Int": 265}, "special": "Mana Regen", "price": 11400000},
+    {"name": "Swift Sword Supreme Eternal", "type": "weapon", "stats": {"Str": 262, "Spd": 192}, "price": 11350000},
+    {"name": "Ring of Infinite Omniscience Eternal Supreme", "type": "accessory", "stats": {"Luck": 265, "Int": 192}, "price": 11400000},
+    {"name": "Ember Grand Blade Eternal Supreme", "type": "weapon", "stats": {"Str": 268}, "special": "Burn", "price": 11500000},
+    {"name": "Frost Robes Eternal Supreme", "type": "armor", "stats": {"Int": 268}, "special": "Freeze", "price": 11500000},
+    {"name": "Lucky Pendant Supreme Eternal", "type": "accessory", "stats": {"Luck": 268, "Str": 194}, "price": 11550000},
+    {"name": "Shadow Saber Eternal Supreme", "type": "weapon", "stats": {"Str": 270}, "special": "Stealth", "price": 11600000},
+    {"name": "Arcane Robes Eternal Supreme", "type": "armor", "stats": {"Int": 270}, "special": "Mana Regen", "price": 11600000},
+    {"name": "Swift Helm Supreme Eternal", "type": "armor", "stats": {"Spd": 268, "Str": 194}, "price": 11550000},
+    {"name": "Ring of Infinite Fortune Supreme Eternal", "type": "accessory", "stats": {"Luck": 270, "Int": 194}, "price": 11600000},
+    {"name": "Inferno Wand Supreme Eternal", "type": "weapon", "stats": {"Int": 272}, "special": "Fire AoE", "price": 11700000},
+    {"name": "Frostfang Supreme Eternal", "type": "weapon", "stats": {"Str": 272}, "special": "Ice AoE", "price": 11700000},
+    {"name": "Lucky Amulet Eternal Supreme", "type": "accessory", "stats": {"Luck": 272, "Str": 196}, "price": 11750000},
+    {"name": "Shadow Blade Supreme Eternal", "type": "weapon", "stats": {"Str": 274}, "special": "Stealth", "price": 11800000},
+    {"name": "Arcane Robes Supreme Eternal", "type": "armor", "stats": {"Int": 274}, "special": "Mana Regen", "price": 11800000},
+    {"name": "Swift Sword Eternal Supreme", "type": "weapon", "stats": {"Str": 272, "Spd": 196}, "price": 11750000},
+    {"name": "Ring of Infinite Valor Supreme Eternal", "type": "accessory", "stats": {"Luck": 274, "Int": 196}, "price": 11800000},
+    {"name": "Ember Staff Supreme Eternal", "type": "weapon", "stats": {"Int": 276}, "special": "Fire AoE", "price": 11900000},
+    {"name": "Frost Saber Supreme Eternal", "type": "weapon", "stats": {"Str": 276}, "special": "Freeze", "price": 11900000},
+    {"name": "Lucky Ring Eternal Supreme", "type": "accessory", "stats": {"Luck": 276, "Str": 198}, "price": 11950000},
+    {"name": "Shadow Staff Supreme Eternal", "type": "weapon", "stats": {"Str": 278}, "special": "Stealth", "price": 12000000},
+    {"name": "Arcane Mantle Supreme Eternal", "type": "armor", "stats": {"Int": 278}, "special": "Mana Regen", "price": 12000000},
+    {"name": "Swift Helm Eternal Supreme", "type": "armor", "stats": {"Spd": 276, "Str": 198}, "price": 11950000},
+    {"name": "Ring of Infinite Insight Supreme Eternal", "type": "accessory", "stats": {"Luck": 278, "Int": 198}, "price": 12000000},
+    {"name": "Ember Blade Supreme Eternal", "type": "weapon", "stats": {"Str": 280}, "special": "Burn", "price": 12100000},
+    {"name": "Frost Robes Supreme Eternal", "type": "armor", "stats": {"Int": 280}, "special": "Freeze", "price": 12100000},
+    {"name": "Lucky Pendant Eternal Supreme", "type": "accessory", "stats": {"Luck": 280, "Str": 200}, "price": 12150000},
+    {"name": "Shadow Dagger Supreme Eternal", "type": "weapon", "stats": {"Str": 282}, "special": "Stealth", "price": 12200000},
+    {"name": "Arcane Hood Supreme Eternal", "type": "armor", "stats": {"Int": 282}, "special": "Mana Boost", "price": 12200000},
+    {"name": "Swift Sword Eternal Supreme", "type": "weapon", "stats": {"Str": 280, "Spd": 200}, "price": 12150000},
+    {"name": "Ring of Infinite Fortune Supreme Eternal", "type": "accessory", "stats": {"Luck": 282, "Int": 200}, "price": 12200000},
+    {"name": "Ember Staff Eternal Supreme", "type": "weapon", "stats": {"Int": 284}, "special": "Fire AoE", "price": 12300000},
+    {"name": "Frost Fang Supreme Eternal", "type": "weapon", "stats": {"Str": 284}, "special": "Ice AoE", "price": 12300000},
+    {"name": "Lucky Amulet Supreme Eternal", "type": "accessory", "stats": {"Luck": 284, "Str": 202}, "price": 12350000},
+    {"name": "Shadow Blade Eternal Supreme", "type": "weapon", "stats": {"Str": 286}, "special": "Stealth", "price": 12400000},
+    {"name": "Arcane Robes Eternal Supreme", "type": "armor", "stats": {"Int": 286}, "special": "Mana Regen", "price": 12400000},
+    {"name": "Swift Helm Eternal Supreme", "type": "armor", "stats": {"Spd": 284, "Str": 202}, "price": 12350000},
+    {"name": "Ring of Infinite Fortune Eternal Supreme", "type": "accessory", "stats": {"Luck": 286, "Int": 202}, "price": 12400000},
+    {"name": "Ember Blade Eternal Supreme", "type": "weapon", "stats": {"Str": 288}, "special": "Fire AoE", "price": 12500000},
+    {"name": "Frost Robes Eternal Supreme", "type": "armor", "stats": {"Int": 288}, "special": "Freeze", "price": 12500000},
+    {"name": "Lucky Ring Supreme Eternal", "type": "accessory", "stats": {"Luck": 288, "Str": 204}, "price": 12550000},
+    {"name": "Shadow Staff Eternal Supreme", "type": "weapon", "stats": {"Str": 290}, "special": "Stealth", "price": 12600000},
+    {"name": "Arcane Mantle Eternal Supreme", "type": "armor", "stats": {"Int": 290}, "special": "Mana Regen", "price": 12600000},
+    {"name": "Swift Sword Supreme Eternal", "type": "weapon", "stats": {"Str": 288, "Spd": 254}, "price": 12550000},
+    {"name": "Ring of Infinite Insight Eternal Supreme", "type": "accessory", "stats": {"Luck": 290, "Int": 254}, "price": 12600000},
+    {"name": "Absolute", "type": "special", "stats": {}, "special": "Guarantees a fatal strike at the start of the battle to 1 enemy", "price": 15000000}
+]
+
+# items_tier6_ssumxr.py
+# Tier 6: SSUMXR / Absolute Items (Final Tier)
+
+items = [
+    {"name": "Oblivion Reaper Absolute", "type": "weapon", "stats": {"Str": 400, "Luck": 350}, "price": 1000000000000},
+    {"name": "Eternal Eclipse Greatblade Absolute", "type": "weapon", "stats": {"Str": 405, "Spd": 345}, "price": 1050000000000},
+    {"name": "Archmage Supreme Robe Absolute", "type": "armor", "stats": {"Int": 405, "Luck": 350}, "price": 1050000000000},
+    {"name": "Shadow Eclipse Eternal Mantle Absolute", "type": "armor", "stats": {"Spd": 400, "Luck": 350}, "price": 1020000000000},
+    {"name": "Phoenix Soul Grand Saber Absolute", "type": "weapon", "stats": {"Str": 410}, "special": "Fire AoE 340", "price": 1100000000000},
+    {"name": "Frost Reaper Eternal Bow Absolute", "type": "weapon", "stats": {"Spd": 408}, "special": "Ice Damage 345", "price": 1100000000000},
+    {"name": "Orb of Infinite Omniscience Absolute", "type": "accessory", "stats": {"Int": 405, "Luck": 345}, "price": 1070000000000},
+    {"name": "Titan’s Eternal Gauntlets Absolute", "type": "armor", "stats": {"Str": 400, "Spd": 350}, "price": 1020000000000},
+    {"name": "Lightning Devastator Absolute", "type": "weapon", "stats": {"Str": 410}, "special": "Lightning AoE", "price": 1100000000000},
+    {"name": "Mystic Grand Supreme Staff Absolute", "type": "weapon", "stats": {"Int": 410}, "special": "Mana Regen", "price": 1100000000000},
+    {"name": "Shadow Fang Absolute", "type": "weapon", "stats": {"Str": 405}, "special": "Stealth", "price": 1070000000000},
+    {"name": "Swift Ascendant Prime Boots Absolute", "type": "armor", "stats": {"Spd": 405, "Str": 350}, "price": 1050000000000},
+    {"name": "Ring of Infinite Omniscience Absolute", "type": "accessory", "stats": {"Luck": 410, "Str": 0, "Int": 0, "Spd": 0}, "price": 1100000000000},
+    {"name": "Inferno Edge Absolute", "type": "weapon", "stats": {"Str": 408}, "special": "Burn", "price": 1100000000000},
+    {"name": "Glacial Saber Absolute", "type": "weapon", "stats": {"Str": 408}, "special": "Freeze", "price": 1100000000000},
+    {"name": "Pendant of Infinite Luck Absolute", "type": "accessory", "stats": {"Luck": 410, "Str": 340}, "price": 1120000000000},
+    {"name": "Eclipse Staff Absolute", "type": "weapon", "stats": {"Str": 410}, "special": "Stealth", "price": 1120000000000},
+    {"name": "Arcane Mantle Absolute", "type": "armor", "stats": {"Int": 410}, "special": "Mana Regen", "price": 1120000000000},
+    {"name": "Swift Grand Blade Absolute", "type": "weapon", "stats": {"Str": 408, "Spd": 355}, "price": 1110000000000},
+    {"name": "Ring of Infinite Valor Absolute", "type": "accessory", "stats": {"Luck": 410, "Int": 355}, "price": 1120000000000},
+    {"name": "Infernal Wand Absolute", "type": "weapon", "stats": {"Int": 412}, "special": "Fire AoE", "price": 1130000000000},
+    {"name": "Frostfang Absolute", "type": "weapon", "stats": {"Str": 412}, "special": "Ice AoE", "price": 1130000000000},
+    {"name": "Lucky Talisman Absolute", "type": "accessory", "stats": {"Luck": 412, "Str": 342}, "price": 1135000000000},
+    {"name": "Shadow Blade Absolute", "type": "weapon", "stats": {"Str": 415}, "special": "Stealth", "price": 1140000000000},
+    {"name": "Arcane Mantle Absolute Supreme", "type": "armor", "stats": {"Int": 415}, "special": "Mana Regen", "price": 1140000000000},
+    {"name": "Swift Sword Absolute", "type": "weapon", "stats": {"Str": 412, "Spd": 342}, "price": 1135000000000},
+    {"name": "Ring of Infinite Omniscience Absolute Supreme", "type": "accessory", "stats": {"Luck": 415, "Int": 342}, "price": 1140000000000},
+    {"name": "Ember Grand Blade Absolute", "type": "weapon", "stats": {"Str": 418}, "special": "Burn", "price": 1150000000000},
+    {"name": "Frost Robes Absolute", "type": "armor", "stats": {"Int": 418}, "special": "Freeze", "price": 1150000000000},
+    {"name": "Lucky Pendant Absolute", "type": "accessory", "stats": {"Luck": 418, "Str": 344}, "price": 1155000000000},
+    {"name": "Shadow Saber Absolute", "type": "weapon", "stats": {"Str": 420}, "special": "Stealth", "price": 1160000000000},
+    {"name": "Arcane Robes Absolute", "type": "armor", "stats": {"Int": 420}, "special": "Mana Regen", "price": 1160000000000},
+    {"name": "Swift Helm Absolute", "type": "armor", "stats": {"Spd": 418, "Str": 344}, "price": 1155000000000},
+    {"name": "Ring of Infinite Fortune Absolute", "type": "accessory", "stats": {"Luck": 420, "Int": 344}, "price": 1160000000000},
+    {"name": "Absolute Omega", "type": "special", "stats": {}, "special": "Guarantees a fatal strike at the start of the battle to 1 enemy", "price": 1500000000000}
+]
+
+# accounts.py
+# Handles admin and player accounts
+
+import json
+import os
+
+ACCOUNTS_FILE = "accounts.json"
+
+def load_accounts():
+    if os.path.exists(ACCOUNTS_FILE):
+        with open(ACCOUNTS_FILE, "r") as f:
+            return json.load(f)
+    else:
+        return {"admins": [], "players": {}}
+
+def save_accounts(accounts):
+    with open(ACCOUNTS_FILE, "w") as f:
+        json.dump(accounts, f, indent=4)
+
+# Admin management
+def add_admin(username):
+    accounts = load_accounts()
+    if username not in accounts["admins"]:
+        accounts["admins"].append(username)
+        save_accounts(accounts)
+        return True
+    return False
+
+def remove_admin(username):
+    accounts = load_accounts()
+    if username in accounts["admins"]:
+        accounts["admins"].remove(username)
+        save_accounts(accounts)
+        return True
+    return False
+
+# Player management
+def add_player(username):
+    accounts = load_accounts()
+    if username not in accounts["players"]:
+        accounts["players"][username] = {
+            "inventory": [],
+            "equipped": {},
+            "stats": {"Str": 10, "Spd": 10, "Int": 10, "Luck": 10, "Pot": 10},
+            "currency": 0
+        }
+        save_accounts(accounts)
+        return True
+    return False
+
+def remove_player(username):
+    accounts = load_accounts()
+    if username in accounts["players"]:
+        del accounts["players"][username]
+        save_accounts(accounts)
+        return True
+    return False
+
+def get_player(username):
+    accounts = load_accounts()
+    return accounts["players"].get(username, None)
+
+def update_player(username, data):
+    accounts = load_accounts()
+    if username in accounts["players"]:
+        accounts["players"][username].update(data)
+        save_accounts(accounts)
+        return True
+    return False
+
+# inventory.py
+# Manages adding/removing items from players
+
+from accounts import load_accounts, save_accounts
+
+def add_item_to_player(username, item):
+    accounts = load_accounts()
+    if username in accounts["players"]:
+        accounts["players"][username]["inventory"].append(item)
+        save_accounts(accounts)
+        return True
+    return False
+
+def remove_item_from_player(username, item_name):
+    accounts = load_accounts()
+    if username in accounts["players"]:
+        inv = accounts["players"][username]["inventory"]
+        for i, item in enumerate(inv):
+            if item["name"] == item_name:
+                inv.pop(i)
+                save_accounts(accounts)
+                return True
+    return False
+
+def equip_item(username, item_name):
+    accounts = load_accounts()
+    if username in accounts["players"]:
+        player = accounts["players"][username]
+        for item in player["inventory"]:
+            if item["name"] == item_name:
+                player["equipped"][item_name] = item
+                save_accounts(accounts)
+                return True
+    return False
+
+def unequip_item(username, item_name):
+    accounts = load_accounts()
+    if username in accounts["players"]:
+        player = accounts["players"][username]
+        if item_name in player["equipped"]:
+            del player["equipped"][item_name]
+            save_accounts(accounts)
+            return True
+    return False
+
+LegendOfValor/
+│
+├─ main.py                # Game launcher, admin & player menus
+├─ accounts.py            # Admin/player management
+├─ inventory.py           # Inventory & equipment management
+├─ items/
+│   ├─ tier1_common.py
+│   ├─ tier2_sr.py
+│   ├─ tier3_ssr.py
+│   ├─ tier4_x.py
+│   ├─ tier5_xu.py
+│   ├─ tier6_umr.py
+│   ├─ tier7_sumr.py
+│   ├─ tier8_ssumr.py
+│   ├─ tier9_ssumxr.py
+│   └─ tier10_absolute.py
+└─ accounts.json          # Saved accounts (created automatically)

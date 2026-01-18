@@ -1,0 +1,217 @@
+# player_account_system.py
+
+import json
+import os
+
+# -------------------------------
+# FILE SETUP
+# -------------------------------
+if not os.path.exists("players"):
+    os.mkdir("players")
+
+# -------------------------------
+# DEFAULT PLAYER TEMPLATE
+# -------------------------------
+default_player = {
+    "name": "",
+    "rank": "Novice",
+    "wins": 0,
+    "losses": 0,
+    "tp": 0,  # currency
+    "inventory": [],  # list of item IDs
+    "equipped": {
+        "weapon": None,
+        "armor": None,
+        "accessory1": None,
+        "accessory2": None
+    },
+    "stats": {
+        "Str": 10,
+        "Spd": 10,
+        "Int": 10,
+        "Luck": 10,
+        "Pot": 0,  # optional
+    },
+    "is_admin": False
+}
+
+# -------------------------------
+# PLAYER MANAGEMENT FUNCTIONS
+# -------------------------------
+
+def create_player(name, admin=False):
+    filename = f"players/{name}.json"
+    if os.path.exists(filename):
+        print(f"Player '{name}' already exists!")
+        return
+    player = default_player.copy()
+    player["name"] = name
+    player["is_admin"] = admin
+    with open(filename, "w") as f:
+        json.dump(player, f, indent=4)
+    print(f"Player '{name}' created successfully!")
+
+def load_player(name):
+    filename = f"players/{name}.json"
+    if not os.path.exists(filename):
+        print(f"Player '{name}' does not exist!")
+        return None
+    with open(filename, "r") as f:
+        return json.load(f)
+
+def save_player(player):
+    filename = f"players/{player['name']}.json"
+    with open(filename, "w") as f:
+        json.dump(player, f, indent=4)
+
+# -------------------------------
+# ITEM & STATS SYSTEM
+# -------------------------------
+
+# Example items database (we'll expand with full tier files later)
+items_db = {
+    "Dragon Soul Sword": {"type": "weapon", "Str": 30, "Spd": 30},
+    "Robe of the Archmage": {"type": "armor", "Int": 30, "Luck": 30},
+    "Cloak of Shadows": {"type": "accessory", "Spd": 20, "Luck": 20},
+}
+
+def equip_item(player, item_name, slot):
+    if item_name not in player["inventory"]:
+        print(f"You do not own '{item_name}'!")
+        return
+    item = items_db.get(item_name)
+    if not item:
+        print(f"Item '{item_name}' does not exist!")
+        return
+    player["equipped"][slot] = item_name
+    update_player_stats(player)
+    save_player(player)
+    print(f"{item_name} equipped to {slot}!")
+
+def update_player_stats(player):
+    # Reset to base stats
+    base = default_player["stats"]
+    player["stats"] = {k: base[k] for k in base}
+    
+    # Add equipped items stats
+    for slot, item_name in player["equipped"].items():
+        if item_name:
+            item = items_db[item_name]
+            for stat, val in item.items():
+                if stat in player["stats"]:
+
+# admin_tools.py
+
+import json
+import os
+
+# -------------------------------
+# LOAD & SAVE FUNCTIONS
+# -------------------------------
+def load_player(name):
+    filename = f"players/{name}.json"
+    if not os.path.exists(filename):
+        print(f"Player '{name}' does not exist!")
+        return None
+    with open(filename, "r") as f:
+        return json.load(f)
+
+def save_player(player):
+    filename = f"players/{player['name']}.json"
+    with open(filename, "w") as f:
+        json.dump(player, f, indent=4)
+
+# -------------------------------
+# ADMIN MODIFY FUNCTION
+# -------------------------------
+def admin_modify(player, section, key=None, value=None, action="set"):
+    """
+    Admin can modify any section of a player account
+    section: 'stats', 'tp', 'wins', 'losses', 'rank', 'inventory', 'equipped'
+    key: specific key inside section if needed (like 'Str' in stats or slot in equipped)
+    value: value to set/add/deduct
+    action: 'set', 'add', 'deduct', 'append', 'remove'
+    """
+    if section not in player:
+        print(f"Section '{section}' does not exist in player account!")
+        return
+
+    if section in ["stats", "equipped"]:
+        if key is None:
+            print("You must specify a key for this section!")
+            return
+        if key not in player[section]:
+            print(f"Key '{key}' does not exist in section '{section}'!")
+            return
+        if action == "set":
+            player[section][key] = value
+        elif action == "add":
+            player[section][key] += value
+        elif action == "deduct":
+            player[section][key] -= value
+        else:
+            print("Invalid action! Use 'set', 'add', or 'deduct'.")
+            return
+    elif section in ["tp", "wins", "losses"]:
+        if action == "set":
+            player[section] = value
+        elif action == "add":
+            player[section] += value
+        elif action == "deduct":
+            player[section] -= value
+        else:
+            print("Invalid action! Use 'set', 'add', or 'deduct'.")
+            return
+    elif section == "rank":
+        if action == "set":
+            player[section] = value
+        else:
+            print("Invalid action! Rank can only be 'set'.")
+            return
+    elif section == "inventory":
+        if action == "append":
+            player[section].append(value)
+        elif action == "remove":
+            if value in player[section]:
+                player[section].remove(value)
+            else:
+                print(f"{value} is not in inventory!")
+                return
+        else:
+            print("Invalid action! Use 'append' or 'remove' for inventory.")
+            return
+    else:
+        print("Unknown section!")
+
+    save_player(player)
+    print(f"Admin modification successful on '{player['name']}' [{section}]!")
+
+# -------------------------------
+# EXAMPLE USAGE
+# -------------------------------
+if __name__ == "__main__":
+    # Load a player
+    player = load_player("Player1")
+
+    # Modify stats
+    admin_modify(player, "stats", "Str", 50, "set")
+    admin_modify(player, "stats", "Luck", 10, "add")
+    admin_modify(player, "stats", "Spd", 5, "deduct")
+
+    # Modify wins/losses/TP
+    admin_modify(player, "wins", value=5, action="add")
+    admin_modify(player, "losses", value=1, action="deduct")
+    admin_modify(player, "tp", value=1000, action="add")
+
+    # Change rank
+    admin_modify(player, "rank", value="Elite", action="set")
+
+    # Modify inventory
+    admin_modify(player, "inventory", value="Dragon Soul Sword", action="append")
+    admin_modify(player, "inventory", value="Old Sword", action="remove")
+
+    # Equip/unequip items
+    admin_modify(player, "equipped", key="weapon", value="Dragon Soul Sword", action="set")
+
+    # Show updated player
+    print(json.dumps(player, indent=4))
